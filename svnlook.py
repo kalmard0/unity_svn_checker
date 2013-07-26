@@ -6,15 +6,23 @@ svnlook = "/usr/bin/svnlook"
 BypassCommand = "bypass-hook"
 
 class SvnLook:
-	def __init__(self, repo, txn):
+	AddMarker = "A"
+	DeleteMarker = "D"
+	UpdateMarker = "U"
+
+	def __init__(self, repo, txn = None, revision = None):
 		self.repo = repo
 		self.txn = txn
+		self.revision = revision
 
 	def Call(self, params):
-		command = [svnlook, params, "-t", self.txn, self.repo]
+		if self.txn is not None:
+			command = [svnlook, params, "-t", self.txn, self.repo]
+		else:
+			command = [svnlook, params, "-r", self.revision, self.repo]
 		return subprocess.check_output(command, universal_newlines = True)
 
-	def FindChange(self, changeType):
+	def GetChanges(self, changeType):
 		changes = self.Call("changed")
 		changed = []
 		for line in changes.splitlines():
@@ -24,7 +32,9 @@ class SvnLook:
 				changed.append(line[4:])
 		return changed
 
+	def GetLog(self):
+		return self.Call("log")
+		
 	def CheckBypass(self):
-		log = self.Call("log")
-		return BypassCommand in log
+		return BypassCommand in self.GetLog()
 
