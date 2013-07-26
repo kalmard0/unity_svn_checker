@@ -22,7 +22,7 @@ def EnforceMetadata(changes):
 			metaIndex = change.find(MetaDataExtension)
 			if (metaIndex >= 0 and metaIndex == len(change) - len(MetaDataExtension)):
 				metas.add(change)
-			else if not change in MetaDataExtensionExceptions:
+			elif not change in MetaDataExtensionExceptions:
 				files.add(change)
 	
 	for file in files:
