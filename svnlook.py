@@ -5,44 +5,26 @@ import fnmatch
 svnlook = "/usr/bin/svnlook"
 BypassCommand = "bypass-hook"
 
-def svnlook_find(repo, txn, changeType):
-	
-	cmd = "'%s' changed -t '%s' '%s'" % (svnlook, txn, repo)
-	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+class SvnLook:
+	def __init__(self, repo, txn):
+		self.repo = repo
+		self.txn = txn
 
-	changed = []
-	while True:
-		line = p.stdout.readline()
-		if not line:
-			break
-		line = line.decode().strip()
-		text_mod = line[0:1]
-		if text_mod == changeType:
-			changed.append(line[4:])
+	def Call(self, params):
+		command = [svnlook, params, "-t", self.txn, self.repo]
+		return subprocess.check_output(command, universal_newlines = True)
 
-	data = p.communicate()
-	if p.returncode != 0:
-		sys.stderr.write(data[1].decode())
-		sys.exit(2)
+	def FindChange(self, changeType):
+		changes = self.Call("changed")
+		changed = []
+		for line in changes.splitlines():
+			line = line.decode().strip()
+			text_mod = line[0:1]
+			if text_mod == changeType:
+				changed.append(line[4:])
+		return changed
 
-	return changed
-
-def svnlook_checkbypass(repo, txn):
-	bypass = False
-	cmd = "'%s' log -t '%s' '%s'" % (svnlook, txn, repo)
-	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-	while True:
-		line = p.stdout.readline()
-		if not line:
-			break
-		if BypassCommand in line:
-			bypass = True
-
-	data = p.communicate()
-	if p.returncode != 0:
-		sys.stderr.write(data[1].decode())
-		sys.exit(2)
-
-	return bypass
+	def CheckBypass(self):
+		log = self.Call("log")
+		return BypassCommand in log
 

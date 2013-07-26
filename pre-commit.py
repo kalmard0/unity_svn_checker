@@ -2,13 +2,13 @@
 
 import sys
 from sets import Set
-import svnlook
+from svnlook import SvnLook
 
 AssetDir = "Assets/"
 MetaDataExtension = ".meta"
 InvalidFiles = Set(["Thumbs.db"])
 
-def enforce_metadata(changes):
+def EnforceMetadata(changes):
 	ret = True
 
 	files = Set()
@@ -39,7 +39,7 @@ def enforce_metadata(changes):
 
 	return ret
 
-def validate_files(changes):
+def ValidateFiles(changes):
 	ret = True
 	for change in changes:
 		slashIdx = change.rfind("/")
@@ -53,15 +53,16 @@ def validate_files(changes):
 
 def main(repo, txn):
 	ret = True
-	if not svnlook.svnlook_checkbypass(repo, txn):
-		added = svnlook.svnlook_find(repo, txn, "A")
-		if not enforce_metadata(added):
+	svnlook = SvnLook(repo, txn)
+	if not svnlook.CheckBypass():
+		added = svnlook.FindChange("A")
+		if not EnforceMetadata(added):
 			ret = False
-		if not validate_files(added):
+		if not ValidateFiles(added):
 			ret = False
 
-		deleted = svnlook.svnlook_find(repo, txn, "D")
-		if not enforce_metadata(deleted):
+		deleted = svnlook.FindChange("D")
+		if not EnforceMetadata(deleted):
 			ret = False
 	return 1
 	
