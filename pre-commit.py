@@ -53,15 +53,16 @@ def validate_files(changes):
 
 def main(repo, txn):
 	ret = True
-	added = svnlook.svnlook_find(repo, txn, "A")
-	if not enforce_metadata(added):
-		ret = False
-	if not validate_files(added):
-		ret = False
+	if not svnlook.svnlook_checkbypass(repo, txn):
+		added = svnlook.svnlook_find(repo, txn, "A")
+		if not enforce_metadata(added):
+			ret = False
+		if not validate_files(added):
+			ret = False
 
-	deleted = svnlook.svnlook_find(repo, txn, "D")
-	if not enforce_metadata(deleted):
-		ret = False
+		deleted = svnlook.svnlook_find(repo, txn, "D")
+		if not enforce_metadata(deleted):
+			ret = False
 	return 1
 	
 
