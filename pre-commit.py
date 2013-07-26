@@ -6,6 +6,7 @@ from svnlook import SvnLook
 
 AssetDir = "Assets/"
 MetaDataExtension = ".meta"
+MetaDataExtensionExceptions = Set()
 InvalidFiles = Set(["Thumbs.db"])
 
 def EnforceMetadata(changes):
@@ -14,7 +15,6 @@ def EnforceMetadata(changes):
 	files = Set()
 	metas = Set()
 	for change in changes:
-		inAsset = False
 		if change[-1] == "/":
 			change = change[0:-1]
 		index = change.find(AssetDir)
@@ -22,7 +22,7 @@ def EnforceMetadata(changes):
 			metaIndex = change.find(MetaDataExtension)
 			if (metaIndex >= 0 and metaIndex == len(change) - len(MetaDataExtension)):
 				metas.add(change)
-			else:
+			else if not change in MetaDataExtensionExceptions:
 				files.add(change)
 	
 	for file in files:
@@ -64,8 +64,12 @@ def main(repo, txn):
 		deleted = svnlook.FindChange("D")
 		if not EnforceMetadata(deleted):
 			ret = False
-	return 1
-	
+
+	if not ret:
+		print "If you believe these are not real errors, add \"bypass-hook\" to the commit message."
+		return 1
+
+	return 0
 
 if __name__ == "__main__":
 	if len(sys.argv) != 3:
