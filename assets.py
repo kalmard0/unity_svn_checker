@@ -15,7 +15,7 @@ def IsAsset(path):
 
 def IsMetaData(path):
 	metaIndex = path.find(MetaDataExtension)
-	return metaIndex >= 0 and metaIndex == len(change) - len(MetaDataExtension)
+	return metaIndex >= 0 and metaIndex == len(path) - len(MetaDataExtension)
 
 def GetMetaDataName(path):
 	return path + MetaDataExtension
