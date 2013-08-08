@@ -1,0 +1,22 @@
+unity_svn_checker
+
+Daniel Kalmar - kalmard@gmail.com
+
+This is a collection of server-side svn hooks to make version control for Unity3D a little easier when working with .meta files.
+They are public domain, so you can do whatever you want with them. If you make some changes that other people may benefit from (especially bug fixes), please consider sending me a patch or a pull request.
+
+What do these scripts do?
+
+The pre-commit hook validates the files that you're about to commit. Specifically:
+-it won't let you commit certain "invalid" files (currently Thumbs.db)
+-if you add or remove a file under Assets, it enforces adding/removing the related .meta file as well
+
+The post-commit hook is a helper for artists and other lazy people that don't write svn commit messages. If it detects an empty commit message, it will list all the files added/updated/removed in the commit.
+
+Using either of the hooks is optional. For a guide on setting them up, see http://bit.ly/178ciIm
+
+Unfortunately since these are server-side hooks, the pre-commit hook will throw an error and refuse to commit your changes when it detects an issue. If you believe there is no issue with your commit, you can bypass the hook temporarily by adding the following string to your commit message:
+bypass-hook
+Also if you find an issue like this, please send in a bug report (or better yet, a patch).
+
+Some of these originate from the svn hook example scripts licensed under the Apache license. All these parts have been re-written since.
