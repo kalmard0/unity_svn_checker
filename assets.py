@@ -14,7 +14,7 @@ def IsAsset(path):
 	return index == 0 or path[index - 1] == "/"
 
 def IsMetaData(path):
-	return path.endswidth(MetaDataExtension)
+	return path.endswith(MetaDataExtension)
 
 def GetMetaDataName(path):
 	return path + MetaDataExtension
