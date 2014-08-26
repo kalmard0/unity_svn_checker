@@ -8,6 +8,8 @@ import subprocess
 import assets
 import os
 
+import syslog
+
 CutOffLimit = 10
 
 def AddToLog(newLog, changes, changeName):
@@ -65,14 +67,16 @@ def main(repo, revision):
 		temp = tempfile.NamedTemporaryFile()
 		temp.write(log)
 		temp.flush()
-		subprocess.call(["svnadmin", "setlog", repo, "-r", revision, "--bypass-hooks", temp.name], universal_newlines = True)
+		args = ["svnadmin", "setlog", repo, "-r", revision, "--bypass-hooks", temp.name]
+		subprocess.call(args, universal_newlines = True)
 		temp.close()
 	
 	return 0
 
 if __name__ == "__main__":
 	sys.stdout = sys.stderr
-	if len(sys.argv) != 3:
+	if len(sys.argv) < 3:
+		syslog.syslog("args: " + str(sys.argv))
 		print "invalid args"
 		sys.exit(1)
 	
